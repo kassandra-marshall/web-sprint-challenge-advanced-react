@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 // Suggested initial states
 const initialMessage = ''
@@ -9,10 +9,16 @@ const initialIndex = 4 // the index the "B" is at
 export default function AppFunctional(props) {
   // THE FOLLOWING HELPERS ARE JUST RECOMMENDATIONS.
   // You can delete them and build your own logic from scratch.
-
+  const [values, setValues] = useState({
+    message: initialMessage,
+    email: initialEmail,
+    steps: initialSteps,
+    index: initialIndex
+  })
   function getXY() {
     // It it not necessary to have a state to track the coordinates.
     // It's enough to know what index the "B" is at, to be able to calculate them.
+  
   }
 
   function getXYMessage() {
@@ -23,6 +29,12 @@ export default function AppFunctional(props) {
 
   function reset() {
     // Use this helper to reset all states to their initial values.
+    setValues({
+      message: initialMessage,
+      email: initialEmail,
+      steps: initialSteps,
+      index: initialIndex
+    })
   }
 
   function getNextIndex(direction) {
@@ -34,7 +46,7 @@ export default function AppFunctional(props) {
   function move(evt) {
     // This event handler can use the helper above to obtain a new index for the "B",
     // and change any states accordingly.
-  }
+    }
 
   function onChange(evt) {
     // You will need this to update the value of the input.
