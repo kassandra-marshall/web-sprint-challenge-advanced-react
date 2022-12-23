@@ -28,11 +28,12 @@ export default class AppClass extends React.Component {
     e.preventDefault()
     if(this.state.index === 0 || this.state.index === 1 || this.state.index === 2){
       this.setState({message: "You can't go up"})
-    }
+    }else
     this.setState({
       index: this.state.index-3,
       y: this.state.y-1,
-      steps: this.state.steps + 1})
+      steps: this.state.steps + 1,
+      message: ""})
   }
   
   downArrow = (e) => {
@@ -42,7 +43,7 @@ export default class AppClass extends React.Component {
     }else
     this.setState({
       index:this.state.index+3,
-      x: this.state.x+1,
+      y: this.state.y+1,
       steps: this.state.steps + 1,
       message: ""
     })
@@ -89,7 +90,7 @@ export default class AppClass extends React.Component {
     // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
     // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
     // returns the fully constructed string.
-    // use string interpolation
+    // KM: use string interpolation
   }
 
   reset = () => {
@@ -119,19 +120,31 @@ export default class AppClass extends React.Component {
 
   onSubmit = (evt) => {
     // Use a POST request to send a payload to the server.
-    // http://localhost:9000/api/result
+    // KM: figure out how to clear out email once submitted
     evt.preventDefault()
+    if(this.state.email === ""){
+      this.setState({message: "type valid email"})
+    } else if(this.state.email === "foo@bar.baz"){
+      this.setState({message: "foo@bar.baz failure #71"})
+    }else
+    // KM: do I need to setState here since I already have the request variable?
+    // KM: What is supposed to happen upon submission? There are failed tests for submission.
     this.setState({
       x: this.state.x,
       y: this.state.y,
       steps: this.state.steps,
-      email: this.state.email
+      email: this.state.email,
+      message: ""
     })
-    console.log(this.state);
     const request = {x: this.state.x, y: this.state.y, steps: this.state.steps, email: this.state.email}
     axios.post("http://localhost:9000/api/result", request)
     .then(res => console.log(res))
     .catch(err => console.error(err))
+    this.setState({
+      message: "lady win #29",
+    })
+    const inputField = document.querySelector("#email");
+    inputField.value = ""
   }
 
   render() {
@@ -155,7 +168,6 @@ export default class AppClass extends React.Component {
           <h3 id="message">{this.state.message}</h3>
         </div>
         <div id="keypad">
-          {/* add onclicks to all buttons and feed in the event */}
           <button onClick={this.leftArrow} id="left">LEFT</button>
           <button onClick={this.upArrow} id="up">UP</button>
           <button onClick={this.rightArrow }id="right">RIGHT</button>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import axios from 'axios'
 
 // Suggested initial states
 const initialMessage = ''
@@ -13,8 +14,61 @@ export default function AppFunctional(props) {
     message: initialMessage,
     email: initialEmail,
     steps: initialSteps,
-    index: initialIndex
+    index: initialIndex,
+    x: 2,
+    y: 2
   })
+  const upArrow = (e) => {
+    e.preventDefault()
+    // KM: Figure out how to set error messages and stop index from increasing or going out of range
+    // xy restrictions cap at 3
+    if(values.x > 3 ){
+      setValues({
+        message: values.message = "You can't go up"
+      })
+    }
+    setValues({
+      index: values.index - 3,
+      // KM: why does x show blank without this line of code?
+      x: values.x,
+      y: values.y - 1,
+      steps: values.steps + 1,
+      message: ""
+    })
+  }
+  const downArrow = (e) => {
+    e.preventDefault()
+    // KM: Figure out how to set error messages and stop index from increasing or going out of range
+    setValues({
+      index: values.index + 3,
+      x: values.x,
+      y: values.y + 1,
+      steps: values.steps + 1,
+      message: ""
+    })
+  }
+  const leftArrow = (e) => {
+    e.preventDefault()
+    // KM: Figure out how to set error messages and stop index from increasing or going out of range
+    setValues({
+      index: values.index - 1,
+      x: values.x - 1,
+      y: values.y,
+      steps: values.steps + 1,
+      message: ""
+    })
+  }
+  const rightArrow = (e) => {
+    e.preventDefault(e)
+    // KM: Figure out how to set error messages and stop index from increasing or going out of range
+    setValues({
+      index: values.index + 1,
+      x: values.x + 1,
+      y: values.y,
+      steps: values.steps + 1,
+      message: ""
+    })
+  }
   function getXY() {
     // It it not necessary to have a state to track the coordinates.
     // It's enough to know what index the "B" is at, to be able to calculate them.
@@ -33,7 +87,9 @@ export default function AppFunctional(props) {
       message: initialMessage,
       email: initialEmail,
       steps: initialSteps,
-      index: initialIndex
+      index: initialIndex,
+      x: 2,
+      y: 2
     })
   }
 
@@ -50,23 +106,35 @@ export default function AppFunctional(props) {
 
   function onChange(evt) {
     // You will need this to update the value of the input.
+    setValues({
+      x: values.x,
+      y: values.y,
+      steps: values.steps,
+      email: evt.target.value})
   }
 
   function onSubmit(evt) {
+    evt.preventDefault()
     // Use a POST request to send a payload to the server.
+    // KM: figure out how to clear email field
+    const request = {x: values.x, y: values.y, steps: values.steps, email: values.email}
+    console.log(values);
+    axios.post("http://localhost:9000/api/result", request)
+    .then(res => console.log(res))
+    .catch(err => console.error(err))
   }
 
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
-        <h3 id="coordinates">Coordinates (2, 2)</h3>
-        <h3 id="steps">You moved 0 times</h3>
+        <h3 id="coordinates">Coordinates ({values.x}, {values.y})</h3>
+        <h3 id="steps">You moved {values.steps} times</h3>
       </div>
       <div id="grid">
         {
           [0, 1, 2, 3, 4, 5, 6, 7, 8].map(idx => (
-            <div key={idx} className={`square${idx === 4 ? ' active' : ''}`}>
-              {idx === 4 ? 'B' : null}
+            <div key={idx} className={`square${idx === values.index ? ' active' : ''}`}>
+              {idx === values.index ? 'B' : null}
             </div>
           ))
         }
@@ -75,14 +143,14 @@ export default function AppFunctional(props) {
         <h3 id="message"></h3>
       </div>
       <div id="keypad">
-        <button id="left">LEFT</button>
-        <button id="up">UP</button>
-        <button id="right">RIGHT</button>
-        <button id="down">DOWN</button>
-        <button id="reset">reset</button>
+        <button onClick={leftArrow} id="left">LEFT</button>
+        <button onClick={upArrow} id="up">UP</button>
+        <button onClick={rightArrow} id="right">RIGHT</button>
+        <button onClick={downArrow} id="down">DOWN</button>
+        <button onClick ={reset}id="reset">reset</button>
       </div>
-      <form>
-        <input id="email" type="email" placeholder="type email"></input>
+      <form onSubmit={onSubmit}>
+        <input onChange={onChange} id="email" type="email" placeholder="type email"></input>
         <input id="submit" type="submit"></input>
       </form>
     </div>
