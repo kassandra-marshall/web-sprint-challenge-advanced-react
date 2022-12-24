@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-
+/**
+ * 1-3. figure out how add error message for invalid email("Ouch: email must be a valid email"), no email("Ouch: email is required"), and foo@bar.baz email
+ * 4. figure out how to change times to time for a single step
+ * 5. Should I be doing something different with the catch?
+ */
 // Suggested initial states
 const initialMessage = ''
 const initialEmail = ''
@@ -10,6 +14,7 @@ const initialIndex = 4 // the index the "B" is at
 export default function AppFunctional(props) {
   // THE FOLLOWING HELPERS ARE JUST RECOMMENDATIONS.
   // You can delete them and build your own logic from scratch.
+  
   const [values, setValues] = useState({
     message: initialMessage,
     email: initialEmail,
@@ -20,17 +25,14 @@ export default function AppFunctional(props) {
   })
   const upArrow = (e) => {
     e.preventDefault()
-    // KM: Figure out how to set error messages and stop index from increasing or going out of range
-    // xy restrictions cap at 3
-    if(values.x > 3 ){
-      setValues({
-        message: values.message = "You can't go up"
+    if(values.y <= 1){
+      console.log("click")
+      setValues({ ...values, 
+        message: "You can't go up"
       })
-    }
-    setValues({
+    }else
+    setValues({ ...values,
       index: values.index - 3,
-      // KM: why does x show blank without this line of code?
-      x: values.x,
       y: values.y - 1,
       steps: values.steps + 1,
       message: ""
@@ -38,7 +40,10 @@ export default function AppFunctional(props) {
   }
   const downArrow = (e) => {
     e.preventDefault()
-    // KM: Figure out how to set error messages and stop index from increasing or going out of range
+    if(values.y >= 3){
+      setValues({...values,
+        message: "You can't go down"})
+    }else
     setValues({
       index: values.index + 3,
       x: values.x,
@@ -49,7 +54,10 @@ export default function AppFunctional(props) {
   }
   const leftArrow = (e) => {
     e.preventDefault()
-    // KM: Figure out how to set error messages and stop index from increasing or going out of range
+    if(values.x <= 1){
+      setValues({...values,
+        message: "You can't go left"})
+    }else
     setValues({
       index: values.index - 1,
       x: values.x - 1,
@@ -60,7 +68,10 @@ export default function AppFunctional(props) {
   }
   const rightArrow = (e) => {
     e.preventDefault(e)
-    // KM: Figure out how to set error messages and stop index from increasing or going out of range
+    if(values.x >= 3){
+      setValues({...values,
+        message: "You can't go right"})
+    }else
     setValues({
       index: values.index + 1,
       x: values.x + 1,
@@ -91,6 +102,8 @@ export default function AppFunctional(props) {
       x: 2,
       y: 2
     })
+    const inputField = document.querySelector("#email");
+    inputField.value = ""
   }
 
   function getNextIndex(direction) {
@@ -106,28 +119,40 @@ export default function AppFunctional(props) {
 
   function onChange(evt) {
     // You will need this to update the value of the input.
-    setValues({
-      x: values.x,
-      y: values.y,
-      steps: values.steps,
+    setValues({...values,
       email: evt.target.value})
   }
 
   function onSubmit(evt) {
     evt.preventDefault()
-    // Use a POST request to send a payload to the server.
-    // KM: figure out how to clear email field
     const request = {x: values.x, y: values.y, steps: values.steps, email: values.email}
-    console.log(values);
+    if(values.email === ""){
+      setValues({...values, message: "Ouch: email is required"})
+    }else if(values.email === "foo@bar.baz"){
+      setValues({...values, message: "foo@bar.baz failure #71"})
+    }else
+    // Use a POST request to send a payload to the server.
+    // KM: figure out how add error message for invalid email("Ouch: email must be a valid email"), no email("Ouch: email is required"), and foo@bar.baz email
     axios.post("http://localhost:9000/api/result", request)
-    .then(res => console.log(res))
-    .catch(err => console.error(err))
+    .then(res => setValues({...values, message: res.data.message}))
+    .catch(err => console.log(err))
+    const inputField = document.querySelector("#email");
+    inputField.value = ""
+    setValues({
+      message: initialMessage,
+      email: initialEmail,
+      steps: initialSteps,
+      index: initialIndex,
+      x: 2,
+      y: 2
+    }) 
   }
 
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
         <h3 id="coordinates">Coordinates ({values.x}, {values.y})</h3>
+        {/* KM: figure out how to change times to time for a single step */}
         <h3 id="steps">You moved {values.steps} times</h3>
       </div>
       <div id="grid">
@@ -140,7 +165,7 @@ export default function AppFunctional(props) {
         }
       </div>
       <div className="info">
-        <h3 id="message"></h3>
+        <h3 id="message">{values.message}</h3>
       </div>
       <div id="keypad">
         <button onClick={leftArrow} id="left">LEFT</button>

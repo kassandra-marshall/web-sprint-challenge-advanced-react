@@ -1,6 +1,13 @@
 import React from 'react'
 import axios from 'axios'
 
+/**
+ * 1. figure out why foo@bar.biz test is not passing
+ * 2. figure out how to add another else if for invalid email address "Ouch: email must be a valid email"
+ * 3. figure out how to change times to time for a single step
+ * 4. Should I be doing something different with the catch?
+ */
+
 // Suggested initial states
 const initialMessage = ''
 const initialEmail = ''
@@ -90,14 +97,16 @@ export default class AppClass extends React.Component {
     // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
     // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
     // returns the fully constructed string.
-    // KM: use string interpolation
   }
 
   reset = () => {
     // Use this helper to reset all states to their initial values.
+    // reset email field
     this.setState({
       ...initialState
     })
+    const inputField = document.querySelector("#email");
+    inputField.value = ""
   }
 
   getNextIndex = (direction) => {
@@ -120,15 +129,14 @@ export default class AppClass extends React.Component {
 
   onSubmit = (evt) => {
     // Use a POST request to send a payload to the server.
-    // KM: figure out how to clear out email once submitted
     evt.preventDefault()
     if(this.state.email === ""){
-      this.setState({message: "type valid email"})
+      this.setState({message: "Ouch: email is required"})
     } else if(this.state.email === "foo@bar.baz"){
+      // KM: figure out why this test is not passing
       this.setState({message: "foo@bar.baz failure #71"})
+      // KM: add another else if for invalid email address "Ouch: email must be a valid email"
     }else
-    // KM: do I need to setState here since I already have the request variable?
-    // KM: What is supposed to happen upon submission? There are failed tests for submission.
     this.setState({
       x: this.state.x,
       y: this.state.y,
@@ -138,11 +146,9 @@ export default class AppClass extends React.Component {
     })
     const request = {x: this.state.x, y: this.state.y, steps: this.state.steps, email: this.state.email}
     axios.post("http://localhost:9000/api/result", request)
-    .then(res => console.log(res))
+    .then(res => this.setState({message: res.data.message}))
+    // KM: Should I be doing something different with the catch?
     .catch(err => console.error(err))
-    this.setState({
-      message: "lady win #29",
-    })
     const inputField = document.querySelector("#email");
     inputField.value = ""
   }
@@ -153,6 +159,7 @@ export default class AppClass extends React.Component {
       <div id="wrapper" className={className}>
         <div className="info">
           <h3 id="coordinates">Coordinates ({this.state.x}, {this.state.y})</h3>
+          {/* KM: figure out how to change times to time for a single step */}
           <h3 id="steps">You moved {this.state.steps} times</h3>
         </div>
         <div id="grid">
