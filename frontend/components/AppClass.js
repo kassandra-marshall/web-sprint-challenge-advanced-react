@@ -130,13 +130,13 @@ export default class AppClass extends React.Component {
   onSubmit = (evt) => {
     // Use a POST request to send a payload to the server.
     evt.preventDefault()
-    if(this.state.email === ""){
-      this.setState({message: "Ouch: email is required"})
-    } else if(this.state.email === "foo@bar.baz"){
-      // KM: figure out why this test is not passing
-      this.setState({message: "foo@bar.baz failure #71"})
-      // KM: add another else if for invalid email address "Ouch: email must be a valid email"
-    }else
+    // if(this.state.email === ""){
+    //   this.setState({message: "Ouch: email is required"})
+    // } else if(this.state.email === "foo@bar.baz"){
+    //   // KM: figure out why this test is not passing
+    //   this.setState({message: "foo@bar.baz failure #71"})
+    //   // KM: add another else if for invalid email address "Ouch: email must be a valid email"
+    // }else
     this.setState({
       x: this.state.x,
       y: this.state.y,
@@ -148,9 +148,15 @@ export default class AppClass extends React.Component {
     axios.post("http://localhost:9000/api/result", request)
     .then(res => this.setState({message: res.data.message}))
     // KM: Should I be doing something different with the catch?
-    .catch(err => console.error(err))
+    .catch(err => this.setState({message: err.response.data.message}))
     const inputField = document.querySelector("#email");
     inputField.value = ""
+  }
+
+  stepsMessage () {
+    if (this.state.steps === 1){
+      return 
+    }
   }
 
   render() {
@@ -159,8 +165,7 @@ export default class AppClass extends React.Component {
       <div id="wrapper" className={className}>
         <div className="info">
           <h3 id="coordinates">Coordinates ({this.state.x}, {this.state.y})</h3>
-          {/* KM: figure out how to change times to time for a single step */}
-          <h3 id="steps">You moved {this.state.steps} times</h3>
+          <h3 id="steps">You moved {this.state.steps === 1 ? `${this.state.steps} time` : `${this.state.steps} times` }</h3>
         </div>
         <div id="grid">
           {

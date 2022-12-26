@@ -1,9 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 /**
- * 1-3. figure out how add error message for invalid email("Ouch: email must be a valid email"), no email("Ouch: email is required"), and foo@bar.baz email
  * 4. figure out how to change times to time for a single step
- * 5. Should I be doing something different with the catch?
  */
 // Suggested initial states
 const initialMessage = ''
@@ -126,16 +124,10 @@ export default function AppFunctional(props) {
   function onSubmit(evt) {
     evt.preventDefault()
     const request = {x: values.x, y: values.y, steps: values.steps, email: values.email}
-    if(values.email === ""){
-      setValues({...values, message: "Ouch: email is required"})
-    }else if(values.email === "foo@bar.baz"){
-      setValues({...values, message: "foo@bar.baz failure #71"})
-    }else
     // Use a POST request to send a payload to the server.
-    // KM: figure out how add error message for invalid email("Ouch: email must be a valid email"), no email("Ouch: email is required"), and foo@bar.baz email
     axios.post("http://localhost:9000/api/result", request)
     .then(res => setValues({...values, message: res.data.message}))
-    .catch(err => console.log(err))
+    .catch(err => setValues({...values, message: err.response.data.message}))
     const inputField = document.querySelector("#email");
     inputField.value = ""
     setValues({
@@ -153,7 +145,7 @@ export default function AppFunctional(props) {
       <div className="info">
         <h3 id="coordinates">Coordinates ({values.x}, {values.y})</h3>
         {/* KM: figure out how to change times to time for a single step */}
-        <h3 id="steps">You moved {values.steps} times</h3>
+        <h3 id="steps">You moved {values.steps === 1 ? `${values.steps} time`: `${values.steps} times`}</h3>
       </div>
       <div id="grid">
         {
