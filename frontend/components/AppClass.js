@@ -130,13 +130,6 @@ export default class AppClass extends React.Component {
   onSubmit = (evt) => {
     // Use a POST request to send a payload to the server.
     evt.preventDefault()
-    // if(this.state.email === ""){
-    //   this.setState({message: "Ouch: email is required"})
-    // } else if(this.state.email === "foo@bar.baz"){
-    //   // KM: figure out why this test is not passing
-    //   this.setState({message: "foo@bar.baz failure #71"})
-    //   // KM: add another else if for invalid email address "Ouch: email must be a valid email"
-    // }else
     this.setState({
       x: this.state.x,
       y: this.state.y,
@@ -147,7 +140,6 @@ export default class AppClass extends React.Component {
     const request = {x: this.state.x, y: this.state.y, steps: this.state.steps, email: this.state.email}
     axios.post("http://localhost:9000/api/result", request)
     .then(res => this.setState({message: res.data.message}))
-    // KM: Should I be doing something different with the catch?
     .catch(err => this.setState({message: err.response.data.message}))
     const inputField = document.querySelector("#email");
     inputField.value = ""
